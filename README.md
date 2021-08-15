@@ -11,5 +11,9 @@ There are couples of validation, we need to provide in the above assignment
 
 #To full fill 3rd condition we have added cron job and it will execute every 1 hour, if you want to change the time change the below property value.
 application.properties
-  trade.scheduler.cron.refresh=* * 0/1 * * ?
+  trade.scheduler.cron.refresh=0 0 0/1 1/1 * ?
+
+#Swagger
+Please use below URL for Swagger
+http://localhost:8080/swagger-ui.html#/trade-controller
 
