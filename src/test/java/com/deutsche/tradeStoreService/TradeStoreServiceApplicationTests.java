@@ -1,4 +1,4 @@
-package com.db.tradeStoreService;
+package com.deutsche.tradeStoreService;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

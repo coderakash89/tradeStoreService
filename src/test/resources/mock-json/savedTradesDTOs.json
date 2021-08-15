@@ -1,0 +1,20 @@
+[
+{
+    "tradeId": "T2",
+    "version": 2,
+    "counterPartyId": "CP-1",
+    "bookId": "B1",
+    "maturityDate": "20/09/2021",
+    "createdDate": "12/08/2021",
+    "expired": true
+},
+{
+"tradeId": "T3",
+"version": 1,
+"counterPartyId": "CP-2",
+"bookId": "B2",
+"maturityDate": "21/09/2021",
+"createdDate": "01/08/2021",
+"expired": true
+}
+]
