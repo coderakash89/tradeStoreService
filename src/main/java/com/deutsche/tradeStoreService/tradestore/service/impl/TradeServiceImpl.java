@@ -37,8 +37,6 @@ public class TradeServiceImpl implements TradeService {
     @Override
     public ResponseBean<TradeDTO> saveTrade(TradeDTO tradeDTO) throws ParseException {
 
-        logger.debug("executing saveTrade for "+tradeDTO);
-
         ResponseBean<TradeDTO> responseBean = new ResponseBean<>();
         responseBean.setErrorBean(null);
         Trade responseTrade;

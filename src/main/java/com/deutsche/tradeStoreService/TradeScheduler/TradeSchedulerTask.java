@@ -18,15 +18,7 @@ public class TradeSchedulerTask {
     private TradeService tradeService;
 
     @Scheduled(cron = "${trade.scheduler.cron.refresh}")
-    public void tradeScheduler() {
-        try {
-            logger.info("Started tradeScheduler");
-            tradeService.updateTradeExpiry();
-            logger.info("End tradeScheduler");
-        } catch (ParseException e) {
-            logger.error("Exception while date conversion.", e);
-        } catch (Exception e) {
-            logger.error("Exception under tradeScheduler", e);
-        }
+    public void tradeScheduler() throws ParseException {
+        tradeService.updateTradeExpiry();
     }
 }
