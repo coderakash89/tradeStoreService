@@ -12,7 +12,7 @@ public class TradeStoreMapper {
         tradeDTO.setTradeId(trade.getTradeId());
         tradeDTO.setBookId(trade.getBookId());
         tradeDTO.setCounterPartyId(trade.getCounterPartyId());
-        tradeDTO.setExpired(trade.isExpired());
+        tradeDTO.setExpired(trade.getExpired());
         tradeDTO.setCreatedDate(trade.getCreatedDate());
         tradeDTO.setVersion(trade.getVersion());
         tradeDTO.setMaturityDate(trade.getMaturityDate());

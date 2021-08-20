@@ -45,42 +45,20 @@ public class TradeControllerTest {
 
         when(tradeService.saveTrade(any(TradeDTO.class))).thenReturn(response);
 
-        ResponseBean<TradeDTO> responseBean = tradeController.create(tradeDTO);
+        ResponseBean<TradeDTO> responseBean = tradeController.save(tradeDTO);
 
         Assert.assertEquals(responseBean.getResponsesStatus(), ResponsesStatus.SUCCESS);
         Assert.assertNull(responseBean.getErrorBean());
         Assert.assertEquals(tradeDTO, response.getData());
     }
 
-    @Test
+    @Test(expected = InvalidTradeVersionException.class)
     public void create_InvalidVer_exception() throws ParseException {
         TradeDTO tradeDTO = ResourceUtil.readResourceContents("/mock-json/validTradeDTO.json", new TypeReference<TradeDTO>() {
         });
         String errorMessage = "Trade- "+tradeDTO.getTradeId() + " has invalid version";
         when(tradeService.saveTrade(any(TradeDTO.class))).thenThrow(new InvalidTradeVersionException(errorMessage, ErrorCodes.INVALID_TRADE_VERSION_ERROR_CODE));
-
-        ResponseBean<TradeDTO> responseBean = tradeController.create(tradeDTO);
-
-        Assert.assertEquals(responseBean.getResponsesStatus(), ResponsesStatus.FAILURE);
-        Assert.assertNotNull(responseBean.getErrorBean());
-        Assert.assertEquals(responseBean.getErrorBean().getErrorMessage(), errorMessage);
-        Assert.assertEquals(responseBean.getErrorBean().getErrorCode(), ErrorCodes.INVALID_TRADE_VERSION_ERROR_CODE);
-        Assert.assertEquals(tradeDTO, responseBean.getData());
-    }
-
-    @Test
-    public void create_general_exception() throws ParseException {
-        TradeDTO tradeDTO = ResourceUtil.readResourceContents("/mock-json/validTradeDTO.json", new TypeReference<TradeDTO>() {
-        });
-        when(tradeService.saveTrade(any(TradeDTO.class))).thenThrow(new InvalidTradeVersionException(ErrorCodes.GENERIC_ERROR_MESSAGE, ErrorCodes.GENERIC_ERROR_CODE));
-
-        ResponseBean<TradeDTO> responseBean = tradeController.create(tradeDTO);
-
-        Assert.assertEquals(responseBean.getResponsesStatus(), ResponsesStatus.FAILURE);
-        Assert.assertNotNull(responseBean.getErrorBean());
-        Assert.assertEquals(responseBean.getErrorBean().getErrorMessage(), ErrorCodes.GENERIC_ERROR_MESSAGE );
-        Assert.assertEquals(responseBean.getErrorBean().getErrorCode(), ErrorCodes.GENERIC_ERROR_CODE);
-        Assert.assertEquals(tradeDTO, responseBean.getData());
+        tradeController.save(tradeDTO);
     }
 
 }

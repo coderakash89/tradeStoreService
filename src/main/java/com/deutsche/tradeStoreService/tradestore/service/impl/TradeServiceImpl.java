@@ -47,7 +47,7 @@ public class TradeServiceImpl implements TradeService {
             Optional<Trade> existingTrade = tradeStoreRepository.findById(tradeDTO.getTradeId());
 
             if(existingTrade.isPresent()) {
-                logger.info("Existing Trade"+tradeDTO.getTradeId());
+                logger.info("Existing Trade "+tradeDTO.getTradeId());
 
                 if(TradeValidator.hasValidVersion(existingTrade.get().getVersion(), tradeDTO.getVersion())) {
                     //For equal(or higher) we are overriding Trade
@@ -56,9 +56,10 @@ public class TradeServiceImpl implements TradeService {
 
                     logger.info("Trade Saved successfully "+trade);
                 } else {
-                    String errorMessage = "Trade- "+tradeDTO.getTradeId() + " has invalid version";
+                    String errorMessage = "Trade- "+tradeDTO.getTradeId() + " has invalid version "+tradeDTO.getVersion() +
+                            " Higher version "+existingTrade.get().getVersion()+" already available";
                     logger.error(errorMessage);
-                    throw new InvalidTradeVersionException(errorMessage, ErrorCodes.INVALID_TRADE_VERSION_ERROR_CODE);
+                    throw  new InvalidTradeVersionException(errorMessage, ErrorCodes.INVALID_TRADE_VERSION_ERROR_CODE);
                 }
             } else {
                 logger.info("Creating new Trade..");
