@@ -9,6 +9,8 @@ import com.deutsche.tradeStoreService.tradestore.dto.TradeDTO;
 import com.deutsche.tradeStoreService.tradestore.entity.Trade;
 import com.deutsche.tradeStoreService.tradestore.repository.TradeStoreRepository;
 import com.deutsche.tradeStoreService.tradestore.service.TradeService;
+import com.deutsche.tradeStoreService.tradestore.util.CommonUtils;
+import com.deutsche.tradeStoreService.tradestore.util.Constant;
 import com.deutsche.tradeStoreService.tradestore.util.ErrorCodes;
 import com.deutsche.tradeStoreService.tradestore.util.TradeValidator;
 import org.slf4j.Logger;
@@ -20,7 +22,6 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class TradeServiceImpl implements TradeService {
@@ -37,37 +38,35 @@ public class TradeServiceImpl implements TradeService {
     @Override
     public ResponseBean<TradeDTO> saveTrade(TradeDTO tradeDTO) throws ParseException {
 
+        logger.debug("executing saveTrade for "+tradeDTO);
+
         ResponseBean<TradeDTO> responseBean = new ResponseBean<>();
         responseBean.setErrorBean(null);
         Trade responseTrade;
 
         if(TradeValidator.validMaturityDate(tradeDTO.getMaturityDate())) {
-            Optional<Trade> existingTrade = tradeStoreRepository.findById(tradeDTO.getTradeId());
+             Trade trade = tradeStoreRepository.findTradeWithSameVersion(tradeDTO.getTradeId(), tradeDTO.getVersion());
 
-            if(existingTrade.isPresent()) {
-                logger.info("Existing Trade "+tradeDTO.getTradeId());
-
-                if(TradeValidator.hasValidVersion(existingTrade.get().getVersion(), tradeDTO.getVersion())) {
-                    //For equal(or higher) we are overriding Trade
-                    Trade trade = tradeStoreMapper.convertDTOToEntity(tradeDTO);
-                    responseTrade = tradeStoreRepository.save(trade);
-
-                    logger.info("Trade Saved successfully "+trade);
+                if(trade != null) {
+                    //Existing with same version then override
+                    Trade newTrade = tradeStoreMapper.convertDTOToEntity(tradeDTO);
+                    responseTrade = tradeStoreRepository.save(newTrade);
+                    logger.info("Trade Overridden successfully " + trade);
                 } else {
-                    String errorMessage = "Trade- "+tradeDTO.getTradeId() + " has invalid version "+tradeDTO.getVersion() +
-                            " Higher version "+existingTrade.get().getVersion()+" already available";
-                    logger.error(errorMessage);
-                    throw  new InvalidTradeVersionException(errorMessage, ErrorCodes.INVALID_TRADE_VERSION_ERROR_CODE);
+                    // Check if Trade With higher version available
+                       Trade higherVTrade = tradeStoreRepository.findTradeWithHigherVersion(tradeDTO.getTradeId(), tradeDTO.getVersion());
+                       if(higherVTrade ==null) {
+                        //Means current Trade is of higher version and add it in database
+                           Trade newTrade = tradeStoreMapper.convertDTOToEntity(tradeDTO);
+                           newTrade.setCreatedDate(CommonUtils.convertDateToTimeZone(Constant.TRADE_TIME_ZONE, Constant.DATE_FORMAT, new Date()));
+                           responseTrade = tradeStoreRepository.save(newTrade);
+                       } else {
+                            String errorMessage = "Trade- "+tradeDTO.getTradeId() + " has invalid version "+tradeDTO.getVersion() +
+                                    " Higher version "+higherVTrade.getVersion()+" already available";
+                            logger.error(errorMessage);
+                            throw  new InvalidTradeVersionException(errorMessage, ErrorCodes.INVALID_TRADE_VERSION_ERROR_CODE);
+                       }
                 }
-            } else {
-                logger.info("Creating new Trade..");
-
-                Trade trade = tradeStoreMapper.convertDTOToEntity(tradeDTO);
-                trade.setCreatedDate(new Date());
-                responseTrade = tradeStoreRepository.save(trade);
-
-                logger.info("New Trade Created Successfully "+responseTrade);
-            }
 
             responseBean.setResponsesStatus(ResponsesStatus.SUCCESS);
             TradeDTO responseDTO = tradeStoreMapper.convertEntityToDTO(responseTrade);

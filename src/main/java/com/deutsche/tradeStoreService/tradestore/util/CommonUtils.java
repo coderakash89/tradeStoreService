@@ -17,7 +17,7 @@ public class CommonUtils {
 
     public static Date convertDateToTimeZone(String timeZone, String format, Date date) throws ParseException {
 
-        SimpleDateFormat formatter = new SimpleDateFormat(Constant.DATE_FORMAT);
+        SimpleDateFormat formatter = new SimpleDateFormat(format);
 
         // To TimeZone America/New_York
         SimpleDateFormat sdfAmerica = new SimpleDateFormat(format);

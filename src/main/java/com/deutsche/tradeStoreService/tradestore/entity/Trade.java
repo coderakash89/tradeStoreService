@@ -3,17 +3,19 @@ package com.deutsche.tradeStoreService.tradestore.entity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Date;
 
 @Data
 @Entity(name="Trade")
+@IdClass(TradeIdCompositeKey.class)
 public class  Trade {
+
     @Id
+    @Column(name="tradeId")
     private String tradeId;
 
+    @Id
     @Column(name="version")
     private Integer version;
 
